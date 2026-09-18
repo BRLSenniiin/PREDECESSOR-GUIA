@@ -1641,6 +1641,29 @@
         height: 44px;
         margin: 0 auto;
       }
+      .build-eternal-icon-img {
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--border);
+      }
+      .build-card-bottom-row .build-eternal-icon-img {
+        display: inline-block;
+        vertical-align: middle;
+        width: 18px;
+        height: 18px;
+        margin-right: 4px;
+      }
+      .build-editor-slot-icon .build-eternal-icon-img {
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
+      .build-picker-card-icon .build-eternal-icon-img {
+        display: block;
+        width: 44px;
+        height: 44px;
+        margin: 0 auto;
+      }
       .build-picker-card-name {
         font-size: 11px;
         font-weight: 600;
@@ -5963,6 +5986,12 @@
       // se a imagem não existir, cai no emoji da categoria.
       function itemIconHtml(item, meta) {
         return `<img class="build-item-icon-img" src="${item.img || 'Images/Itens/' + nomeArquivoImg(item.nome) + '.webp'}" alt="${escapeHtml(item.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" /><span style="display:none">${meta.icon}</span>`;
+      }
+
+      // HTML do ícone de um eternal nas builds: imagem circular do eternal (mesmo arquivo do catálogo);
+      // se a imagem não existir, cai no emoji do grupo.
+      function eternalIconHtml(eternal, meta) {
+        return `<img class="build-eternal-icon-img" src="${eternal.img || 'Images/Eternals/' + nomeArquivoImg(eternal.nome) + '.webp'}" alt="${escapeHtml(eternal.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" /><span style="display:none">${meta.icon}</span>`;
       }
 
       function renderHeroes() {
@@ -11479,7 +11508,7 @@ const ETERNAL_GROUP_DESC = {
         const eternalLabel = eternal
           ? (() => {
               const meta = ETERNAL_GROUP_META[eternal.grupo];
-              return `<span style="color: ${meta.color}">${meta.icon} ${escapeHtml(eternal.nome)}</span>`;
+              return `<span style="color: ${meta.color}">${eternalIconHtml(eternal, meta)} ${escapeHtml(eternal.nome)}</span>`;
             })()
           : '<span>Sem Eternal escolhido</span>';
 
@@ -11620,7 +11649,7 @@ const ETERNAL_GROUP_DESC = {
 
         <div class="build-editor-section-label">🔱 ETERNAL</div>
         <div class="build-editor-slot${eternal ? ' filled' : ''}" id="build-editor-eternal-slot">
-          <div class="build-editor-slot-icon">${eternal ? ETERNAL_GROUP_META[eternal.grupo].icon : '➕'}</div>
+          <div class="build-editor-slot-icon">${eternal ? eternalIconHtml(eternal, ETERNAL_GROUP_META[eternal.grupo]) : '➕'}</div>
           <div class="build-editor-slot-text">${eternal ? escapeHtml(eternal.nome) : 'Escolher Eternal…'}</div>
         </div>
         ${eternalMinorsHtml}
@@ -11847,7 +11876,7 @@ const ETERNAL_GROUP_DESC = {
           .map((entity) => {
             const meta = pickerEntityMeta(entity);
             const sub = pickerEntitySubLabel(entity, meta);
-            const iconHtml = pickerMode === 'item' ? itemIconHtml(entity, meta) : meta.icon;
+            const iconHtml = pickerMode === 'item' ? itemIconHtml(entity, meta) : pickerMode === 'eternal' ? eternalIconHtml(entity, meta) : meta.icon;
             return `
           <div class="build-picker-card" style="border-top-color: ${meta.color}" data-nome="${escapeHtml(entity.nome)}">
             <button type="button" class="build-picker-card-info" data-nome="${escapeHtml(entity.nome)}" aria-label="Ver detalhes de ${escapeHtml(entity.nome)}">ℹ</button>
