@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Predecessor — Painel PT-BR</title>
+    <link rel="icon" type="image/webp" href="Images/Icon.webp" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,6 +77,18 @@
         font-size: 15px;
         overflow-x: hidden;
         font-display: swap;
+      }
+
+      /* WALLPAPER (Images/Wallpaper.webp) — fica sob o hex-layer e o atm-layer;
+         o gradiente escuro mantém o texto legível (ajuste o 0.55 se quiser mais/menos escuro) */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(rgba(6, 11, 12, 0.55), rgba(6, 11, 12, 0.55)),
+          url('Images/Wallpaper.webp') center / cover no-repeat;
       }
 
       /* HEX-GRID ARENA BACKDROP */
@@ -179,6 +192,13 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
         filter: drop-shadow(0 0 22px rgba(2, 146, 155, 0.45));
+      }
+      .hdr-title img {
+        display: block;
+        margin: 0 auto;
+        height: clamp(84px, 18vw, 140px);
+        width: auto;
+        max-width: 100%;
       }
       .hdr-sub {
         font-family: 'Space Mono', monospace;
@@ -2160,7 +2180,7 @@
       <div class="hdr">
         <div class="core-emblem" aria-hidden="true"></div>
         <div class="hdr-studio">OMEDA STUDIOS · MOBA DE AÇÃO EM 3ª PESSOA · UNREAL ENGINE 5</div>
-        <h1 class="hdr-title">PREDECESSOR</h1>
+        <h1 class="hdr-title"><img src="Images/Icon.webp" alt="Predecessor" onerror="this.replaceWith(document.createTextNode('PREDECESSOR'))" /></h1>
         <div class="hdr-sub">PAINEL DO JOGO PT-BR</div>
         <div class="hdr-pills">
           <span class="pill" style="border-color: rgba(255, 77, 94, 0.5); color: var(--red)">SEM PLATINA</span>
