@@ -5927,6 +5927,21 @@
           .replace(/^-+|-+$/g, '');
       }
 
+      // Nome de arquivo das imagens (pastas Images/Heroes, Images/Itens, Images/Eternals).
+      // Padrão: sem espaços/símbolos, tudo minúsculo e só a 1ª letra maiúscula.
+      // Ex.: "Feng Mao" -> "Fengmao", "Champion Crest" -> "Championcrest".
+      // Exceções: "Iggy & Scorch" -> "Iggy and Scorch", "Lt. Belica" -> "Belica", "Pilow" -> "Pillow".
+      function nomeArquivoImg(nome) {
+        const excecoes = { 'Iggy & Scorch': 'Iggy and Scorch', 'Lt. Belica': 'Belica', 'Pilow': 'Pillow' };
+        if (excecoes[nome]) return excecoes[nome];
+        const base = nome
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^A-Za-z0-9]/g, '')
+          .toLowerCase();
+        return base.charAt(0).toUpperCase() + base.slice(1);
+      }
+
       function renderHeroes() {
         const grid = document.getElementById('hero-grid');
         const filtered = HEROES.filter((h) => {
@@ -5949,7 +5964,7 @@
             const slug = slugify(h.nome);
             return `
         <div class="hero-card${unconfirmedClass}" style="border-top-color: ${meta.color}" data-index="${HEROES.indexOf(h)}">
-          <img class="hero-card-img" src="${h.img || 'imagens/herois/' + slug + '.jpg'}" alt="${escapeHtml(h.nome)}"
+          <img class="hero-card-img" src="${h.img || 'Images/Heroes/' + nomeArquivoImg(h.nome) + '.webp'}" alt="${escapeHtml(h.nome)}"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
           <div class="hero-card-fallback" style="background: linear-gradient(160deg, var(--bg-card), ${meta.color}22)">${meta.icon}</div>
           <div class="hero-card-overlay">
@@ -6051,7 +6066,7 @@
 
         return `
         <div class="hero-modal-img-wrap">
-          <img class="hero-modal-img" src="${hero.img || 'imagens/herois/' + slug + '.jpg'}" alt="${escapeHtml(hero.nome)}"
+          <img class="hero-modal-img" src="${hero.img || 'Images/Heroes/' + nomeArquivoImg(hero.nome) + '.webp'}" alt="${escapeHtml(hero.nome)}"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
           <div class="hero-modal-img-fallback" style="background: linear-gradient(160deg, var(--bg-card), ${meta.color}22)">${meta.icon}</div>
         </div>
@@ -10161,7 +10176,7 @@ Se Gob Glue é Ativa enquanto mid-air:
             const slug = slugify(it.nome);
             return `
         <div class="item-card" style="border-top-color: ${meta.color}" data-index="${ITEMS.indexOf(it)}">
-          <img class="item-card-img" src="${it.img || 'imagens/itens/' + slug + '.png'}" alt="${escapeHtml(it.nome)}"
+          <img class="item-card-img" src="${it.img || 'Images/Itens/' + nomeArquivoImg(it.nome) + '.webp'}" alt="${escapeHtml(it.nome)}"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
           <div class="item-card-icon-fallback">${meta.icon}</div>
           <div class="item-card-name">${escapeHtml(it.nome)}</div>
@@ -10193,7 +10208,7 @@ Se Gob Glue é Ativa enquanto mid-air:
         const abilityHtml = item.passiva ? `<div class="item-modal-ability">${highlightKeywords(item.passiva)}</div>` : '';
 
         return `
-        <img class="item-modal-img" src="${item.img || 'imagens/itens/' + slug + '.png'}" alt="${escapeHtml(item.nome)}"
+        <img class="item-modal-img" src="${item.img || 'Images/Itens/' + nomeArquivoImg(item.nome) + '.webp'}" alt="${escapeHtml(item.nome)}"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="item-modal-icon-fallback">${meta.icon}</div>
         <div class="item-modal-name">${escapeHtml(item.nome)}</div>
@@ -10578,7 +10593,7 @@ const ETERNAL_GROUP_DESC = {
             const slug = slugify(e.nome);
             return `
         <div class="eternal-card" style="border-top-color: ${meta.color}" data-index="${ETERNALS.indexOf(e)}">
-          <img class="eternal-card-img" src="${e.img || 'imagens/eternals/' + slug + '.png'}" alt="${escapeHtml(e.nome)}"
+          <img class="eternal-card-img" src="${e.img || 'Images/Eternals/' + nomeArquivoImg(e.nome) + '.webp'}" alt="${escapeHtml(e.nome)}"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
           <div class="eternal-card-icon-fallback">${meta.icon}</div>
           <div class="eternal-card-name">${escapeHtml(e.nome)}</div>
@@ -10607,7 +10622,7 @@ const ETERNAL_GROUP_DESC = {
         const slug = slugify(eternal.nome);
 
         return `
-        <img class="eternal-modal-img" src="${eternal.img || 'imagens/eternals/' + slug + '.png'}" alt="${escapeHtml(eternal.nome)}"
+        <img class="eternal-modal-img" src="${eternal.img || 'Images/Eternals/' + nomeArquivoImg(eternal.nome) + '.webp'}" alt="${escapeHtml(eternal.nome)}"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="eternal-modal-icon-fallback">${meta.icon}</div>
         <div class="eternal-modal-name">${escapeHtml(eternal.nome)}</div>
