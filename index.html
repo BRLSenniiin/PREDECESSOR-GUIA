@@ -1552,6 +1552,259 @@
         text-align: center;
       }
 
+      /* ═══════════════════════════════════════════════
+         ATUALIZAÇÕES (notas pessoais ligando Herói + Itens + Eternal
+         citados nelas — recurso independente do sistema de Builds,
+         também salvo em localStorage; reaproveita a casca visual
+         .build-editor-overlay/.build-editor/.build-btn/.build-card-*
+         já existente pra não duplicar CSS de estrutura)
+         ═══════════════════════════════════════════════ */
+      .update-note {
+        font-size: 12px;
+        color: var(--text-dim);
+        margin-bottom: 14px;
+        line-height: 1.6;
+      }
+      .update-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .update-count {
+        font-family: 'Space Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        letter-spacing: 1px;
+      }
+      #updates-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .update-empty {
+        text-align: center;
+        color: var(--text-dim);
+        font-size: 13px;
+        padding: 40px 14px;
+        border: 1px dashed var(--border);
+      }
+      .update-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 14px;
+        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      }
+      .update-card-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .update-card-date {
+        font-size: 10px;
+        color: var(--text-muted);
+        font-family: 'Space Mono', monospace;
+        text-align: right;
+      }
+      .update-card-title {
+        font-family: 'Chakra Petch', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--lime-light);
+        margin-bottom: 8px;
+      }
+      .update-card-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .update-chip {
+        font-family: 'Space Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.3px;
+        padding: 4px 8px;
+        border: 1px solid var(--teal-dim);
+        color: var(--teal-light);
+        background: rgba(2, 146, 155, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .update-chip.gold {
+        border-color: var(--gold-dim);
+        color: var(--gold-light);
+        background: rgba(255, 209, 102, 0.1);
+      }
+      .update-chip-remove {
+        background: transparent;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 10px;
+        padding: 0;
+      }
+      .update-card-highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .update-highlight {
+        font-size: 11px;
+        color: var(--text-dim);
+        background: rgba(255, 255, 255, 0.03);
+        border-left: 2px solid var(--gold);
+        padding: 3px 8px;
+      }
+      .update-highlight strong {
+        color: var(--gold-light);
+      }
+      .update-card-nota {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 12px;
+        white-space: pre-wrap;
+      }
+      .update-select {
+        width: 100%;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 13px;
+        padding: 9px 10px;
+        margin-bottom: 10px;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+      }
+      .update-select:focus {
+        outline: none;
+        border-color: var(--teal);
+      }
+      .update-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .update-textarea {
+        width: 100%;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 13px;
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        resize: vertical;
+        clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+      }
+      .update-textarea:focus {
+        outline: none;
+        border-color: var(--teal);
+      }
+      .update-highlight-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .update-highlight-row input {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        padding: 7px 9px;
+        flex: 1;
+        min-width: 0;
+      }
+      .update-highlight-row input:focus {
+        outline: none;
+        border-color: var(--teal);
+      }
+      .update-highlight-remove {
+        background: rgba(255, 77, 94, 0.12);
+        border: 1px solid var(--red);
+        color: var(--red);
+        cursor: pointer;
+        font-size: 11px;
+        padding: 0 10px;
+      }
+
+      /* corrente visual dos cards de Atualização: imagem do Herói --- imagem(ns)
+         do(s) Item(ns) citado(s) --- imagem do Eternal citado. Quando não há
+         Item ou Eternal vinculado, cai num ícone de informação (ℹ️) no lugar. */
+      .update-card-top {
+        justify-content: space-between;
+      }
+      .update-chain {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .update-chain-thumb {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-section);
+        border: 1px solid var(--border);
+        font-size: 17px;
+        overflow: hidden;
+      }
+      .update-chain-thumb.hero-thumb {
+        border-radius: 6px;
+      }
+      .update-chain-thumb.item-thumb {
+        border-radius: 6px;
+        padding: 3px;
+      }
+      .update-chain-thumb.eternal-thumb {
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+      }
+      .update-chain-thumb.info {
+        border-style: dashed;
+        border-color: var(--teal-dim);
+        background: rgba(2, 146, 155, 0.06);
+        color: var(--teal-light);
+      }
+      .update-chain-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .update-chain-thumb .build-item-icon-img {
+        width: 100%;
+        height: 100%;
+      }
+      .update-chain-thumb .build-eternal-icon-img {
+        width: 100%;
+        height: 100%;
+      }
+      .update-chain-fallback {
+        font-size: 18px;
+      }
+      .update-chain-thumb-group {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .update-chain-connector {
+        font-family: 'Space Mono', monospace;
+        color: var(--text-muted);
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
       /* seletor (picker) de Herói / Item / Eternal usado dentro do editor de build */
       .build-picker-overlay {
         display: none;
@@ -2197,6 +2450,7 @@
         <button class="tab-btn" data-tab="items">🛡️ Itens</button>
         <button class="tab-btn" data-tab="eternals">🔱 Eternals</button>
         <button class="tab-btn" data-tab="builds">🛠️ Builds</button>
+        <button class="tab-btn" data-tab="updates">📝 Atualizações</button>
       </div>
 
       <!-- ══════════════ VISÃO GERAL ══════════════ -->
@@ -2417,6 +2671,24 @@
       </div>
       <!-- /panel-builds -->
 
+      <!-- ══════════════ ATUALIZAÇÕES ══════════════ -->
+      <div class="panel" id="panel-updates">
+        <div class="update-note">
+          Registre aqui suas próprias anotações sobre mudanças de patch, sinergias ou observações — cada
+          atualização fica vinculada a um <strong class="teal">Herói</strong>, podendo citar
+          <strong class="lime">Itens</strong> e um <strong class="gold">Eternal</strong>, além de destaques
+          numéricos/percentuais opcionais (ex.: "Dano físico: +15%"). Tudo fica
+          <strong class="teal">salvo neste navegador</strong> via <code>localStorage</code>, separado das
+          Builds — limpar dados de navegação ou trocar de aparelho/navegador apaga as atualizações salvas.
+        </div>
+        <div class="update-toolbar">
+          <div class="update-count" id="update-count"></div>
+          <button class="build-btn" id="update-new-btn">+ NOVA ATUALIZAÇÃO</button>
+        </div>
+        <div id="updates-list"></div>
+      </div>
+      <!-- /panel-updates -->
+
       <div class="foot">
         ⚡ PREDECESSOR · PAINEL PT-BR · 17 TROFÉUS · 54 HERÓIS ⚡<br />
         DADOS DE TROFÉUS ESTIMADOS — CONFIRME EM EXOPHASE.COM / PSNPROFILES.COM<br />
@@ -2447,6 +2719,11 @@
     <!-- SELETOR (Herói / Item / Eternal) USADO DENTRO DO EDITOR DE BUILD -->
     <div class="build-picker-overlay" id="build-picker-overlay">
       <div class="build-picker" id="build-picker-content"></div>
+    </div>
+
+    <!-- EDITOR DE ATUALIZAÇÃO (Herói + Itens + Eternal citados + notas pessoais) -->
+    <div class="build-editor-overlay" id="update-editor-overlay">
+      <div class="build-editor" id="update-editor-content"></div>
     </div>
 
     <script>
@@ -12034,6 +12311,312 @@ const ETERNAL_GROUP_DESC = {
       });
 
       renderBuildList();
+
+      // ═══════════════════════════════════════════════════════════════
+      //  ATUALIZAÇÕES — notas pessoais ligando Herói + Itens + Eternal
+      //  citados nelas. Recurso independente do sistema de Builds acima
+      //  (não reaproveita editorDraft/pickerMode dele, pra não arriscar
+      //  quebrar Builds); usa sua própria chave de localStorage.
+      // ═══════════════════════════════════════════════════════════════
+      const UPDATES_STORAGE_KEY = 'predecessor_atualizacoes_v1';
+
+      function loadUpdates() {
+        try {
+          const raw = localStorage.getItem(UPDATES_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveUpdates() {
+        try {
+          localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(updates));
+        } catch (e) {}
+      }
+
+      let updates = loadUpdates();
+      let updateEditorDraft = null;
+
+      function blankUpdateDraft() {
+        return {
+          id: null,
+          createdAt: null,
+          heroNome: '',
+          itemNomes: [],
+          eternalNome: '',
+          titulo: '',
+          nota: '',
+          destaques: [],
+        };
+      }
+
+      function renderUpdateList() {
+        const list = document.getElementById('updates-list');
+        const countEl = document.getElementById('update-count');
+        countEl.textContent = `${updates.length} ATUALIZAÇÃO(ÕES) SALVA(S)`;
+
+        if (updates.length === 0) {
+          list.innerHTML =
+            '<div class="update-empty">Nenhuma atualização registrada ainda. Clique em "+ Nova Atualização" pra criar a primeira.</div>';
+          return;
+        }
+
+        list.innerHTML = updates
+          .slice()
+          .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+          .map((u) => {
+            const INFO_THUMB = '<div class="update-chain-thumb info" title="Sem vínculo">ℹ️</div>';
+
+            const hero = HEROES.find((h) => h.nome === u.heroNome);
+            const heroThumb = hero
+              ? `<div class="update-chain-thumb hero-thumb" title="${escapeHtml(hero.nome)}"><img class="update-chain-img" src="${
+                  hero.img || 'Images/Heroes/' + nomeArquivoImg(hero.nome) + '.webp'
+                }" alt="${escapeHtml(hero.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><span class="update-chain-fallback" style="display:none">${
+                  roleMeta(hero.papel).icon
+                }</span></div>`
+              : INFO_THUMB;
+
+            const itemEntities = (u.itemNomes || []).map((nome) => ITEMS.find((it) => it.nome === nome)).filter(Boolean);
+            const itemThumbs = itemEntities.length
+              ? itemEntities
+                  .map(
+                    (it) =>
+                      `<div class="update-chain-thumb item-thumb" title="${escapeHtml(it.nome)}">${itemIconHtml(
+                        it,
+                        ITEM_CATEGORY_META[it.categoria]
+                      )}</div>`
+                  )
+                  .join('')
+              : INFO_THUMB;
+
+            const eternalEntity = u.eternalNome ? ETERNALS.find((e) => e.nome === u.eternalNome) : null;
+            const eternalThumb = eternalEntity
+              ? `<div class="update-chain-thumb eternal-thumb" title="${escapeHtml(eternalEntity.nome)}">${eternalIconHtml(
+                  eternalEntity,
+                  ETERNAL_GROUP_META[eternalEntity.grupo]
+                )}</div>`
+              : INFO_THUMB;
+
+            const destaques = (u.destaques || [])
+              .filter((d) => d.label || d.valor)
+              .map((d) => `<span class="update-highlight">${escapeHtml(d.label)}: <strong>${escapeHtml(d.valor)}</strong></span>`)
+              .join('');
+            const dataFmt = u.createdAt ? new Date(u.createdAt).toLocaleDateString('pt-BR') : '';
+            return `
+            <div class="update-card">
+              <div class="update-card-top">
+                <div class="update-chain">
+                  ${heroThumb}
+                  <div class="update-chain-connector">→</div>
+                  <div class="update-chain-thumb-group">${itemThumbs}</div>
+                  <div class="update-chain-connector">→</div>
+                  ${eternalThumb}
+                </div>
+                <div class="update-card-date">${dataFmt}</div>
+              </div>
+              <div class="build-card-hero-name">${escapeHtml(u.heroNome || '—')}</div>
+              ${u.titulo ? `<div class="update-card-title">${escapeHtml(u.titulo)}</div>` : ''}
+              ${destaques ? `<div class="update-card-highlights">${destaques}</div>` : ''}
+              ${u.nota ? `<div class="update-card-nota">${escapeHtml(u.nota)}</div>` : ''}
+              <div class="build-card-actions">
+                <button type="button" class="build-btn update-edit-btn" data-id="${u.id}">✏️ Editar</button>
+                <button type="button" class="build-btn danger update-delete-btn" data-id="${u.id}">🗑️ Excluir</button>
+              </div>
+            </div>
+          `;
+          })
+          .join('');
+
+        list.querySelectorAll('.update-edit-btn').forEach((btn) => {
+          btn.addEventListener('click', () => openUpdateEditor(btn.dataset.id));
+        });
+        list.querySelectorAll('.update-delete-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (!confirm('Excluir esta atualização?')) return;
+            updates = updates.filter((u) => u.id !== btn.dataset.id);
+            saveUpdates();
+            renderUpdateList();
+          });
+        });
+      }
+
+      function openUpdateEditor(id) {
+        if (id) {
+          const existing = updates.find((u) => u.id === id);
+          updateEditorDraft = existing ? JSON.parse(JSON.stringify(existing)) : blankUpdateDraft();
+        } else {
+          updateEditorDraft = blankUpdateDraft();
+        }
+        document.getElementById('update-editor-overlay').classList.add('active');
+        renderUpdateEditor();
+      }
+
+      function closeUpdateEditor() {
+        document.getElementById('update-editor-overlay').classList.remove('active');
+        updateEditorDraft = null;
+      }
+
+      function renderUpdateEditor() {
+        const container = document.getElementById('update-editor-content');
+        const d = updateEditorDraft;
+
+        const heroOptions = ['<option value="">— selecione —</option>']
+          .concat(
+            HEROES.map(
+              (h) => `<option value="${escapeHtml(h.nome)}" ${h.nome === d.heroNome ? 'selected' : ''}>${escapeHtml(h.nome)}</option>`
+            )
+          )
+          .join('');
+
+        const eternalOptions = ['<option value="">— nenhum —</option>']
+          .concat(
+            ETERNALS.map(
+              (e) => `<option value="${escapeHtml(e.nome)}" ${e.nome === d.eternalNome ? 'selected' : ''}>${escapeHtml(e.nome)}</option>`
+            )
+          )
+          .join('');
+
+        const itemChips = (d.itemNomes || [])
+          .map(
+            (nome, idx) =>
+              `<span class="update-chip removable" data-idx="${idx}">🛡️ ${escapeHtml(nome)} <button type="button" class="update-chip-remove" data-idx="${idx}" aria-label="Remover ${escapeHtml(nome)}">✕</button></span>`
+          )
+          .join('');
+
+        const itemAddOptions = ['<option value="">+ adicionar item…</option>']
+          .concat(ITEMS.map((it) => `<option value="${escapeHtml(it.nome)}">${escapeHtml(it.nome)}</option>`))
+          .join('');
+
+        const destaqueRows = (d.destaques || [])
+          .map(
+            (h, idx) => `
+            <div class="update-highlight-row" data-idx="${idx}">
+              <input type="text" class="update-highlight-label" data-idx="${idx}" placeholder="Ex.: Dano físico" value="${escapeHtml(h.label)}" />
+              <input type="text" class="update-highlight-valor" data-idx="${idx}" placeholder="Ex.: +15%" value="${escapeHtml(h.valor)}" />
+              <button type="button" class="update-highlight-remove" data-idx="${idx}" aria-label="Remover destaque">✕</button>
+            </div>
+          `
+          )
+          .join('');
+
+        container.innerHTML = `
+          <button class="build-editor-close" id="update-editor-close" aria-label="Fechar">✕</button>
+          <div class="build-editor-title">${d.id ? 'Editar Atualização' : 'Nova Atualização'}</div>
+
+          <div class="build-editor-section-label">HERÓI VINCULADO</div>
+          <select class="update-select" id="update-hero-select">${heroOptions}</select>
+
+          <div class="build-editor-section-label">ITENS CITADOS</div>
+          <div class="update-chip-row" id="update-item-chips">${itemChips}</div>
+          <select class="update-select" id="update-item-add-select">${itemAddOptions}</select>
+
+          <div class="build-editor-section-label">ETERNAL CITADO (OPCIONAL)</div>
+          <select class="update-select" id="update-eternal-select">${eternalOptions}</select>
+
+          <div class="build-editor-section-label">TÍTULO DA NOTA</div>
+          <input type="text" class="build-editor-name-input" id="update-titulo-input" placeholder="Ex.: Buff na V1.16" value="${escapeHtml(d.titulo)}" />
+
+          <div class="build-editor-section-label">SEUS PONTOS / OBSERVAÇÕES</div>
+          <textarea class="update-textarea" id="update-nota-input" rows="5" placeholder="Escreva aqui suas observações…">${escapeHtml(d.nota)}</textarea>
+
+          <div class="build-editor-section-label">DESTAQUES NUMÉRICOS / PORCENTAGENS (OPCIONAL)</div>
+          <div id="update-highlights-list">${destaqueRows}</div>
+          <button type="button" class="build-btn ghost" id="update-add-highlight-btn">+ Adicionar destaque</button>
+
+          <div class="build-editor-actions">
+            <button type="button" class="build-btn" id="update-save-btn">💾 Salvar</button>
+            <button type="button" class="build-btn ghost" id="update-cancel-btn">Cancelar</button>
+          </div>
+        `;
+
+        document.getElementById('update-editor-close').addEventListener('click', closeUpdateEditor);
+        document.getElementById('update-cancel-btn').addEventListener('click', closeUpdateEditor);
+
+        document.getElementById('update-hero-select').addEventListener('change', (e) => {
+          updateEditorDraft.heroNome = e.target.value;
+        });
+
+        document.getElementById('update-eternal-select').addEventListener('change', (e) => {
+          updateEditorDraft.eternalNome = e.target.value;
+        });
+
+        document.getElementById('update-item-add-select').addEventListener('change', (e) => {
+          const val = e.target.value;
+          if (!val) return;
+          if (!updateEditorDraft.itemNomes.includes(val)) {
+            updateEditorDraft.itemNomes.push(val);
+          }
+          renderUpdateEditor();
+        });
+
+        container.querySelectorAll('.update-chip-remove').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            updateEditorDraft.itemNomes.splice(Number(btn.dataset.idx), 1);
+            renderUpdateEditor();
+          });
+        });
+
+        document.getElementById('update-titulo-input').addEventListener('input', (e) => {
+          updateEditorDraft.titulo = e.target.value;
+        });
+
+        document.getElementById('update-nota-input').addEventListener('input', (e) => {
+          updateEditorDraft.nota = e.target.value;
+        });
+
+        document.getElementById('update-add-highlight-btn').addEventListener('click', () => {
+          updateEditorDraft.destaques.push({ label: '', valor: '' });
+          renderUpdateEditor();
+        });
+
+        container.querySelectorAll('.update-highlight-label').forEach((input) => {
+          input.addEventListener('input', (e) => {
+            updateEditorDraft.destaques[Number(e.target.dataset.idx)].label = e.target.value;
+          });
+        });
+        container.querySelectorAll('.update-highlight-valor').forEach((input) => {
+          input.addEventListener('input', (e) => {
+            updateEditorDraft.destaques[Number(e.target.dataset.idx)].valor = e.target.value;
+          });
+        });
+        container.querySelectorAll('.update-highlight-remove').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            updateEditorDraft.destaques.splice(Number(btn.dataset.idx), 1);
+            renderUpdateEditor();
+          });
+        });
+
+        document.getElementById('update-save-btn').addEventListener('click', () => {
+          if (!updateEditorDraft.heroNome) {
+            alert('Selecione um herói pra vincular esta atualização.');
+            return;
+          }
+          if (!updateEditorDraft.id) {
+            updateEditorDraft.id = 'upd_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+            updateEditorDraft.createdAt = new Date().toISOString();
+            updates.push(updateEditorDraft);
+          } else {
+            const idx = updates.findIndex((u) => u.id === updateEditorDraft.id);
+            updateEditorDraft.createdAt = updateEditorDraft.createdAt || new Date().toISOString();
+            if (idx >= 0) updates[idx] = updateEditorDraft;
+          }
+          saveUpdates();
+          closeUpdateEditor();
+          renderUpdateList();
+        });
+      }
+
+      document.getElementById('update-new-btn').addEventListener('click', () => openUpdateEditor(null));
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('update-editor-overlay').classList.contains('active')) {
+          closeUpdateEditor();
+        }
+      });
+
+      renderUpdateList();
     </script>
   </body>
 </html>
