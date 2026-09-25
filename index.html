@@ -12366,37 +12366,47 @@ const ETERNAL_GROUP_DESC = {
           .slice()
           .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
           .map((u) => {
-            const INFO_THUMB = '<div class="update-chain-thumb info" title="Sem vínculo">ℹ️</div>';
+            const chainParts = [];
 
-            const hero = HEROES.find((h) => h.nome === u.heroNome);
-            const heroThumb = hero
-              ? `<div class="update-chain-thumb hero-thumb" title="${escapeHtml(hero.nome)}"><img class="update-chain-img" src="${
-                  hero.img || 'Images/Heroes/' + nomeArquivoImg(hero.nome) + '.webp'
-                }" alt="${escapeHtml(hero.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><span class="update-chain-fallback" style="display:none">${
-                  roleMeta(hero.papel).icon
-                }</span></div>`
-              : INFO_THUMB;
+            if (u.heroNome) {
+              const hero = HEROES.find((h) => h.nome === u.heroNome);
+              chainParts.push(
+                hero
+                  ? `<div class="update-chain-thumb hero-thumb" title="${escapeHtml(hero.nome)}"><img class="update-chain-img" src="${
+                      hero.img || 'Images/Heroes/' + nomeArquivoImg(hero.nome) + '.webp'
+                    }" alt="${escapeHtml(hero.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><span class="update-chain-fallback" style="display:none">${
+                      roleMeta(hero.papel).icon
+                    }</span></div>`
+                  : `<div class="update-chain-thumb hero-thumb" title="${escapeHtml(u.heroNome)}">❔</div>`
+              );
+            }
 
-            const itemEntities = (u.itemNomes || []).map((nome) => ITEMS.find((it) => it.nome === nome)).filter(Boolean);
-            const itemThumbs = itemEntities.length
-              ? itemEntities
-                  .map(
-                    (it) =>
-                      `<div class="update-chain-thumb item-thumb" title="${escapeHtml(it.nome)}">${itemIconHtml(
-                        it,
-                        ITEM_CATEGORY_META[it.categoria]
-                      )}</div>`
-                  )
-                  .join('')
-              : INFO_THUMB;
-
-            const eternalEntity = u.eternalNome ? ETERNALS.find((e) => e.nome === u.eternalNome) : null;
-            const eternalThumb = eternalEntity
-              ? `<div class="update-chain-thumb eternal-thumb" title="${escapeHtml(eternalEntity.nome)}">${eternalIconHtml(
-                  eternalEntity,
-                  ETERNAL_GROUP_META[eternalEntity.grupo]
+            (u.itemNomes || []).forEach((nome) => {
+              const it = ITEMS.find((i) => i.nome === nome);
+              if (!it) return;
+              chainParts.push(
+                `<div class="update-chain-thumb item-thumb" title="${escapeHtml(it.nome)}">${itemIconHtml(
+                  it,
+                  ITEM_CATEGORY_META[it.categoria]
                 )}</div>`
-              : INFO_THUMB;
+              );
+            });
+
+            if (u.eternalNome) {
+              const eternalEntity = ETERNALS.find((e) => e.nome === u.eternalNome);
+              chainParts.push(
+                eternalEntity
+                  ? `<div class="update-chain-thumb eternal-thumb" title="${escapeHtml(eternalEntity.nome)}">${eternalIconHtml(
+                      eternalEntity,
+                      ETERNAL_GROUP_META[eternalEntity.grupo]
+                    )}</div>`
+                  : `<div class="update-chain-thumb eternal-thumb" title="${escapeHtml(u.eternalNome)}">🔱</div>`
+              );
+            }
+
+            const chainHtml = chainParts.length
+              ? chainParts.join('<div class="update-chain-connector">--</div>')
+              : '<div class="update-chain-thumb info" title="Sem vínculo">ℹ️</div>';
 
             const destaques = (u.destaques || [])
               .filter((d) => d.label || d.valor)
@@ -12406,16 +12416,10 @@ const ETERNAL_GROUP_DESC = {
             return `
             <div class="update-card">
               <div class="update-card-top">
-                <div class="update-chain">
-                  ${heroThumb}
-                  <div class="update-chain-connector">→</div>
-                  <div class="update-chain-thumb-group">${itemThumbs}</div>
-                  <div class="update-chain-connector">→</div>
-                  ${eternalThumb}
-                </div>
-                <div class="update-card-date">${dataFmt}</div>
+                <div class="update-chain">${chainHtml}</div>
+                ${dataFmt ? `<div class="update-card-date">${dataFmt}</div>` : ''}
               </div>
-              <div class="build-card-hero-name">${escapeHtml(u.heroNome || '—')}</div>
+              ${u.heroNome ? `<div class="build-card-hero-name">${escapeHtml(u.heroNome)}</div>` : ''}
               ${u.titulo ? `<div class="update-card-title">${escapeHtml(u.titulo)}</div>` : ''}
               ${destaques ? `<div class="update-card-highlights">${destaques}</div>` : ''}
               ${u.nota ? `<div class="update-card-nota">${escapeHtml(u.nota)}</div>` : ''}
@@ -12504,7 +12508,7 @@ const ETERNAL_GROUP_DESC = {
           <button class="build-editor-close" id="update-editor-close" aria-label="Fechar">✕</button>
           <div class="build-editor-title">${d.id ? 'Editar Atualização' : 'Nova Atualização'}</div>
 
-          <div class="build-editor-section-label">HERÓI VINCULADO</div>
+          <div class="build-editor-section-label">HERÓI VINCULADO (OPCIONAL)</div>
           <select class="update-select" id="update-hero-select">${heroOptions}</select>
 
           <div class="build-editor-section-label">ITENS CITADOS</div>
@@ -12588,8 +12592,11 @@ const ETERNAL_GROUP_DESC = {
         });
 
         document.getElementById('update-save-btn').addEventListener('click', () => {
-          if (!updateEditorDraft.heroNome) {
-            alert('Selecione um herói pra vincular esta atualização.');
+          const draft = updateEditorDraft;
+          const temVinculo = draft.heroNome || (draft.itemNomes && draft.itemNomes.length) || draft.eternalNome;
+          const temTexto = (draft.titulo && draft.titulo.trim()) || (draft.nota && draft.nota.trim());
+          if (!temVinculo && !temTexto) {
+            alert('Preencha ao menos um vínculo (Herói/Item/Eternal) ou um texto antes de salvar.');
             return;
           }
           if (!updateEditorDraft.id) {
