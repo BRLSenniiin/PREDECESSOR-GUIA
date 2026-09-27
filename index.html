@@ -1646,6 +1646,15 @@
         font-size: 10px;
         padding: 0;
       }
+      .update-chip-icon {
+        display: inline-flex;
+        align-items: center;
+      }
+      .update-chip-icon .build-item-icon-img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+      }
       .update-card-highlights {
         display: flex;
         flex-wrap: wrap;
@@ -1905,6 +1914,10 @@
         cursor: pointer;
         clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
       }
+      .build-picker-card.selected {
+        border-color: var(--teal);
+        background: rgba(2, 146, 155, 0.14);
+      }
       .build-picker-card-icon {
         font-size: 18px;
         margin-bottom: 4px;
@@ -1933,6 +1946,20 @@
       }
       .build-picker-card-icon .build-eternal-icon-img {
         display: block;
+        width: 44px;
+        height: 44px;
+        margin: 0 auto;
+      }
+      .build-hero-icon-img {
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+      }
+      .build-editor-slot-icon .build-hero-icon-img {
+        width: 32px;
+        height: 32px;
+      }
+      .build-picker-card-icon .build-hero-icon-img {
         width: 44px;
         height: 44px;
         margin: 0 auto;
@@ -2724,6 +2751,13 @@
     <!-- EDITOR DE ATUALIZAÇÃO (Herói + Itens + Eternal citados + notas pessoais) -->
     <div class="build-editor-overlay" id="update-editor-overlay">
       <div class="build-editor" id="update-editor-content"></div>
+    </div>
+
+    <!-- SELETOR COM IMAGEM (Herói / Item / Eternal) USADO DENTRO DO EDITOR DE ATUALIZAÇÃO -->
+    <!-- Independente do build-picker-overlay acima: não reaproveita pickerMode/openPicker
+         de Builds, pra manter Atualizações isolada como já era antes (ver comentário no script). -->
+    <div class="build-picker-overlay" id="update-picker-overlay">
+      <div class="build-picker" id="update-picker-content"></div>
     </div>
 
     <script>
@@ -6289,6 +6323,12 @@
       // se a imagem não existir, cai no emoji do grupo.
       function eternalIconHtml(eternal, meta) {
         return `<img class="build-eternal-icon-img" src="${eternal.img || 'Images/Eternals/' + nomeArquivoImg(eternal.nome) + '.webp'}" alt="${escapeHtml(eternal.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" /><span style="display:none">${meta.icon}</span>`;
+      }
+
+      // HTML do ícone de um herói nas builds: imagem do herói (mesmo arquivo do catálogo);
+      // se a imagem não existir, cai no emoji do papel.
+      function heroIconHtml(hero, meta) {
+        return `<img class="build-hero-icon-img" src="${hero.img || 'Images/Heroes/' + nomeArquivoImg(hero.nome) + '.webp'}" alt="${escapeHtml(hero.nome)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" /><span style="display:none">${meta.icon}</span>`;
       }
 
       function renderHeroes() {
@@ -11936,7 +11976,7 @@ const ETERNAL_GROUP_DESC = {
 
         <div class="build-editor-section-label">🧙 HERÓI</div>
         <div class="build-editor-slot${hero ? ' filled' : ''}" id="build-editor-hero-slot">
-          <div class="build-editor-slot-icon">${hero ? heroMeta.icon : '➕'}</div>
+          <div class="build-editor-slot-icon">${hero ? heroIconHtml(hero, heroMeta) : '➕'}</div>
           <div class="build-editor-slot-text">${hero ? escapeHtml(hero.nome) : 'Escolher herói…'}</div>
         </div>
 
@@ -12176,7 +12216,7 @@ const ETERNAL_GROUP_DESC = {
           .map((entity) => {
             const meta = pickerEntityMeta(entity);
             const sub = pickerEntitySubLabel(entity, meta);
-            const iconHtml = pickerMode === 'item' ? itemIconHtml(entity, meta) : pickerMode === 'eternal' ? eternalIconHtml(entity, meta) : meta.icon;
+            const iconHtml = pickerMode === 'item' ? itemIconHtml(entity, meta) : pickerMode === 'eternal' ? eternalIconHtml(entity, meta) : pickerMode === 'hero' ? heroIconHtml(entity, meta) : meta.icon;
             return `
           <div class="build-picker-card" style="border-top-color: ${meta.color}" data-nome="${escapeHtml(entity.nome)}">
             <button type="button" class="build-picker-card-info" data-nome="${escapeHtml(entity.nome)}" aria-label="Ver detalhes de ${escapeHtml(entity.nome)}">ℹ</button>
@@ -12464,32 +12504,15 @@ const ETERNAL_GROUP_DESC = {
       function renderUpdateEditor() {
         const container = document.getElementById('update-editor-content');
         const d = updateEditorDraft;
-
-        const heroOptions = ['<option value="">— selecione —</option>']
-          .concat(
-            HEROES.map(
-              (h) => `<option value="${escapeHtml(h.nome)}" ${h.nome === d.heroNome ? 'selected' : ''}>${escapeHtml(h.nome)}</option>`
-            )
-          )
-          .join('');
-
-        const eternalOptions = ['<option value="">— nenhum —</option>']
-          .concat(
-            ETERNALS.map(
-              (e) => `<option value="${escapeHtml(e.nome)}" ${e.nome === d.eternalNome ? 'selected' : ''}>${escapeHtml(e.nome)}</option>`
-            )
-          )
-          .join('');
+        const hero = d.heroNome ? HEROES.find((h) => h.nome === d.heroNome) : null;
+        const eternalEntity = d.eternalNome ? ETERNALS.find((e) => e.nome === d.eternalNome) : null;
 
         const itemChips = (d.itemNomes || [])
-          .map(
-            (nome, idx) =>
-              `<span class="update-chip removable" data-idx="${idx}">🛡️ ${escapeHtml(nome)} <button type="button" class="update-chip-remove" data-idx="${idx}" aria-label="Remover ${escapeHtml(nome)}">✕</button></span>`
-          )
-          .join('');
-
-        const itemAddOptions = ['<option value="">+ adicionar item…</option>']
-          .concat(ITEMS.map((it) => `<option value="${escapeHtml(it.nome)}">${escapeHtml(it.nome)}</option>`))
+          .map((nome, idx) => {
+            const it = ITEMS.find((i) => i.nome === nome);
+            const iconHtml = it ? itemIconHtml(it, ITEM_CATEGORY_META[it.categoria]) : '🛡️';
+            return `<span class="update-chip removable" data-idx="${idx}"><span class="update-chip-icon">${iconHtml}</span>${escapeHtml(nome)} <button type="button" class="update-chip-remove" data-idx="${idx}" aria-label="Remover ${escapeHtml(nome)}">✕</button></span>`;
+          })
           .join('');
 
         const destaqueRows = (d.destaques || [])
@@ -12509,14 +12532,25 @@ const ETERNAL_GROUP_DESC = {
           <div class="build-editor-title">${d.id ? 'Editar Atualização' : 'Nova Atualização'}</div>
 
           <div class="build-editor-section-label">HERÓI VINCULADO (OPCIONAL)</div>
-          <select class="update-select" id="update-hero-select">${heroOptions}</select>
+          <div class="build-editor-slot${hero ? ' filled' : ''}" id="update-hero-slot" style="position: relative;">
+            <div class="build-editor-slot-icon">${hero ? heroIconHtml(hero, roleMeta(hero.papel)) : '➕'}</div>
+            <div class="build-editor-slot-text">${hero ? escapeHtml(hero.nome) : 'Selecionar herói…'}</div>
+            ${hero ? `<button type="button" class="update-chip-remove" id="update-hero-clear" aria-label="Remover herói vinculado" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">✕</button>` : ''}
+          </div>
 
           <div class="build-editor-section-label">ITENS CITADOS</div>
           <div class="update-chip-row" id="update-item-chips">${itemChips}</div>
-          <select class="update-select" id="update-item-add-select">${itemAddOptions}</select>
+          <div class="build-editor-slot" id="update-item-add-slot">
+            <div class="build-editor-slot-icon">➕</div>
+            <div class="build-editor-slot-text">Adicionar item…</div>
+          </div>
 
           <div class="build-editor-section-label">ETERNAL CITADO (OPCIONAL)</div>
-          <select class="update-select" id="update-eternal-select">${eternalOptions}</select>
+          <div class="build-editor-slot${eternalEntity ? ' filled' : ''}" id="update-eternal-slot" style="position: relative;">
+            <div class="build-editor-slot-icon">${eternalEntity ? eternalIconHtml(eternalEntity, ETERNAL_GROUP_META[eternalEntity.grupo]) : '➕'}</div>
+            <div class="build-editor-slot-text">${eternalEntity ? escapeHtml(eternalEntity.nome) : 'Selecionar eternal…'}</div>
+            ${eternalEntity ? `<button type="button" class="update-chip-remove" id="update-eternal-clear" aria-label="Remover eternal vinculado" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">✕</button>` : ''}
+          </div>
 
           <div class="build-editor-section-label">TÍTULO DA NOTA</div>
           <input type="text" class="build-editor-name-input" id="update-titulo-input" placeholder="Ex.: Buff na V1.16" value="${escapeHtml(d.titulo)}" />
@@ -12537,24 +12571,35 @@ const ETERNAL_GROUP_DESC = {
         document.getElementById('update-editor-close').addEventListener('click', closeUpdateEditor);
         document.getElementById('update-cancel-btn').addEventListener('click', closeUpdateEditor);
 
-        document.getElementById('update-hero-select').addEventListener('change', (e) => {
-          updateEditorDraft.heroNome = e.target.value;
+        document.getElementById('update-hero-slot').addEventListener('click', (e) => {
+          if (e.target.closest('#update-hero-clear')) return;
+          openUpdatePicker('hero');
         });
+        const heroClearBtn = document.getElementById('update-hero-clear');
+        if (heroClearBtn) {
+          heroClearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateEditorDraft.heroNome = '';
+            renderUpdateEditor();
+          });
+        }
 
-        document.getElementById('update-eternal-select').addEventListener('change', (e) => {
-          updateEditorDraft.eternalNome = e.target.value;
+        document.getElementById('update-eternal-slot').addEventListener('click', (e) => {
+          if (e.target.closest('#update-eternal-clear')) return;
+          openUpdatePicker('eternal');
         });
+        const eternalClearBtn = document.getElementById('update-eternal-clear');
+        if (eternalClearBtn) {
+          eternalClearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            updateEditorDraft.eternalNome = '';
+            renderUpdateEditor();
+          });
+        }
 
-        document.getElementById('update-item-add-select').addEventListener('change', (e) => {
-          const val = e.target.value;
-          if (!val) return;
-          if (!updateEditorDraft.itemNomes.includes(val)) {
-            updateEditorDraft.itemNomes.push(val);
-          }
-          renderUpdateEditor();
-        });
+        document.getElementById('update-item-add-slot').addEventListener('click', () => openUpdatePicker('item'));
 
-        container.querySelectorAll('.update-chip-remove').forEach((btn) => {
+        container.querySelectorAll('.update-chip-remove[data-idx]').forEach((btn) => {
           btn.addEventListener('click', () => {
             updateEditorDraft.itemNomes.splice(Number(btn.dataset.idx), 1);
             renderUpdateEditor();
@@ -12614,14 +12659,128 @@ const ETERNAL_GROUP_DESC = {
         });
       }
 
-      document.getElementById('update-new-btn').addEventListener('click', () => openUpdateEditor(null));
+      // ── Seletor com imagem (Herói/Item/Eternal) pro editor de Atualização ──
+      // Propositalmente independente do pickerMode/openPicker de Builds (ver
+      // comentário acima, no bloco de Atualizações): estado e funções próprios,
+      // pra não arriscar interferir no seletor usado pelas Builds.
+      let updatePickerMode = null;
+      let updatePickerSearch = '';
+
+      function updatePickerSourceData() {
+        if (updatePickerMode === 'hero') return HEROES;
+        if (updatePickerMode === 'item') return ITEMS;
+        if (updatePickerMode === 'eternal') return ETERNALS;
+        return [];
+      }
+
+      function updatePickerEntityMeta(entity) {
+        if (updatePickerMode === 'hero') return roleMeta(entity.papel);
+        if (updatePickerMode === 'item') return ITEM_CATEGORY_META[entity.categoria];
+        if (updatePickerMode === 'eternal') return ETERNAL_GROUP_META[entity.grupo];
+        return { icon: '❔', color: '#628a8d', label: '' };
+      }
+
+      function updatePickerIconHtml(entity, meta) {
+        if (updatePickerMode === 'hero') return heroIconHtml(entity, meta);
+        if (updatePickerMode === 'item') return itemIconHtml(entity, meta);
+        if (updatePickerMode === 'eternal') return eternalIconHtml(entity, meta);
+        return meta.icon;
+      }
+
+      function updatePickerTitle() {
+        if (updatePickerMode === 'hero') return 'Selecionar Herói';
+        if (updatePickerMode === 'item') return 'Adicionar Item';
+        if (updatePickerMode === 'eternal') return 'Selecionar Eternal';
+        return '';
+      }
+
+      function openUpdatePicker(mode) {
+        updatePickerMode = mode;
+        updatePickerSearch = '';
+        document.getElementById('update-picker-overlay').classList.add('active');
+        renderUpdatePickerShell();
+        renderUpdatePickerGrid();
+      }
+
+      function closeUpdatePicker() {
+        document.getElementById('update-picker-overlay').classList.remove('active');
+        updatePickerMode = null;
+      }
+
+      function renderUpdatePickerShell() {
+        const container = document.getElementById('update-picker-content');
+        container.innerHTML = `
+        <div class="build-picker-header">
+          <div class="build-picker-title">${updatePickerTitle()}</div>
+          <button class="build-picker-close" id="update-picker-close" aria-label="Fechar">✕</button>
+        </div>
+        <input class="build-picker-search" id="update-picker-search" type="text" placeholder="Buscar…" />
+        <div class="build-picker-grid" id="update-picker-grid"></div>
+      `;
+        document.getElementById('update-picker-close').addEventListener('click', closeUpdatePicker);
+        document.getElementById('update-picker-search').addEventListener('input', (e) => {
+          updatePickerSearch = e.target.value.trim().toLowerCase();
+          renderUpdatePickerGrid();
+        });
+      }
+
+      function renderUpdatePickerGrid() {
+        const grid = document.getElementById('update-picker-grid');
+        const data = updatePickerSourceData();
+        const filtered = data.filter((entity) => !updatePickerSearch || entity.nome.toLowerCase().includes(updatePickerSearch));
+
+        if (filtered.length === 0) {
+          grid.innerHTML = '<div class="build-picker-empty">Nada encontrado.</div>';
+          return;
+        }
+
+        grid.innerHTML = filtered
+          .map((entity) => {
+            const meta = updatePickerEntityMeta(entity);
+            const iconHtml = updatePickerIconHtml(entity, meta);
+            const already = updatePickerMode === 'item' && (updateEditorDraft.itemNomes || []).includes(entity.nome);
+            return `
+          <div class="build-picker-card${already ? ' selected' : ''}" style="border-top-color: ${meta.color}" data-nome="${escapeHtml(entity.nome)}">
+            <div class="build-picker-card-icon">${iconHtml}</div>
+            <div class="build-picker-card-name">${escapeHtml(entity.nome)}</div>
+          </div>
+        `;
+          })
+          .join('');
+
+        grid.querySelectorAll('.build-picker-card').forEach((card) => {
+          card.addEventListener('click', () => selectFromUpdatePicker(card.dataset.nome));
+        });
+      }
+
+      function selectFromUpdatePicker(nome) {
+        if (updatePickerMode === 'hero') {
+          updateEditorDraft.heroNome = nome;
+          closeUpdatePicker();
+          renderUpdateEditor();
+        } else if (updatePickerMode === 'eternal') {
+          updateEditorDraft.eternalNome = nome;
+          closeUpdatePicker();
+          renderUpdateEditor();
+        } else if (updatePickerMode === 'item') {
+          if (!updateEditorDraft.itemNomes.includes(nome)) {
+            updateEditorDraft.itemNomes.push(nome);
+          }
+          renderUpdateEditor();
+          renderUpdatePickerGrid();
+        }
+      }
 
       document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
-        if (document.getElementById('update-editor-overlay').classList.contains('active')) {
+        if (document.getElementById('update-picker-overlay').classList.contains('active')) {
+          closeUpdatePicker();
+        } else if (document.getElementById('update-editor-overlay').classList.contains('active')) {
           closeUpdateEditor();
         }
       });
+
+      document.getElementById('update-new-btn').addEventListener('click', () => openUpdateEditor(null));
 
       renderUpdateList();
     </script>
